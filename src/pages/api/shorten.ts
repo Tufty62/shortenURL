@@ -1,3 +1,5 @@
+import { generateShortUrl } from '../../utils/generateShortUrl'
+
 export async function POST({ request }) {
     try {
         const body = await request.json();
@@ -18,7 +20,7 @@ export async function POST({ request }) {
             );
         }
 
-        const shortURL = generateShortURL();
+        const shortURL = generateShortUrl();
 
         return new Response(
             JSON.stringify({
