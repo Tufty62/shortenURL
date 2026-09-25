@@ -2,6 +2,52 @@
     <form action="/shorten" method="post">
         <label for="url">Enter URL that you would like to shorten: </label>
         <input type="url" id="url" name="url" required>
+        <button type="submit">Shorten</button>
     </form>
 </div>
 
+
+<div id="result"></div>
+
+<script>
+    const form = document.querySelector<HTMLFormElement>("#urlForm");
+    const result = document.getElementById("result")
+
+    form?.addEventListener("submit", onSubmit);
+
+    async function onSubmit(event: SubmitEvent) {
+        event.preventDefault();
+
+        const input = document.querySelector<HTMLInputElement>("#url");
+
+        const response = await fetch("/api/shorten", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                url: input?.value,
+            })
+        });
+
+        const data = await response.json();
+        
+        if (!result){
+            return
+        }
+
+        const shortURL = new URL(`/${data.short_url}`, window.location.origin);
+
+        result.innerHTML = "";
+
+        const label = document.createElement("span");
+        label.textContent = "Shortened URL: "
+
+        const aelement = document.createElement("a");
+        aelement.href = shortURL.toString();
+        aelement.textContent = shortURL.toString();
+
+        result.appendChild(label);
+        result.appendChild(aelement);
+    }
+</script>
