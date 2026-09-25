@@ -1,46 +1,116 @@
-# Astro Starter Kit: Basics
+# URL Shortener
 
-```sh
-pnpm create astro@latest -- --template basics
+A simple URL shortening web application built with **TypeScript** and **Astro**.
+
+## Overview
+
+This application allows users to enter a long URL and receive a shortened URL. The shortened URL can then be opened to redirect the user to the original URL.
+
+The frontend communicates with the backend through a REST-style API and submits URLs without requiring a page reload.
+
+## Features
+
+* Create shortened URLs from long URLs
+* Validate submitted URLs
+* Prevent collisions between generated short URLs
+* Redirect shortened URLs to their original destination
+* Submit URLs without reloading the page
+* In-memory storage with no external database required
+
+## Tech Stack
+
+* **TypeScript**
+* **Astro**
+* **HTML/CSS**
+* **Fetch API**
+
+## Getting Started
+
+### Prerequisites
+
+* Node.js
+* pnpm
+
+### Installation
+
+Clone the repository and install the dependencies:
+
+```bash
+pnpm install
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+### Running the application
 
-## 🚀 Project Structure
+Start the development server:
 
-Inside of your Astro project, you'll see the following folders and files:
+```bash
+pnpm dev
+```
+
+The application will be available at:
+
+`http://localhost:4321`
+
+## API
+
+### Create a shortened URL
+
+**POST** `/api/shorten`
+
+Request body:
+
+```json
+{
+  "url": "http://www.makeitcheaper.com"
+}
+```
+
+Example response:
+
+```json
+{
+  "short_url": "abc123",
+  "url": "http://www.makeitcheaper.com"
+}
+```
+
+### Redirect to the original URL
+
+**GET** `/{short_url}`
+
+For example:
 
 ```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+GET /abc123
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+A valid shortened URL returns a `301 Moved Permanently` response and redirects to the original URL.
 
-## 🧞 Commands
+If the shortened URL does not exist, the API returns `404 Not Found`.
 
-All commands are run from the root of the project, from a terminal:
+## Implementation
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
+Shortened URLs are generated using a random six-character identifier consisting of letters and numbers.
 
-## 👀 Want to learn more?
+URLs are stored in an in-memory `Map`, with the generated short identifier used to retrieve the original URL.
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+When generating a new shortened URL, the application checks whether the generated identifier already exists and generates another identifier if a collision occurs.
+
+URLs are intentionally not persisted between application restarts.
+
+## Project Structure
+
+```text
+src/
+├── pages/
+│   ├── index.astro
+│   ├── api/
+│   │   └── shorten.ts
+│   └── [shortUrl].ts
+├── stores/
+│   └── urlStore.ts
+└── utils/
+    └── generateShortUrl.ts
+```
+
+
