@@ -1,3 +1,4 @@
+import { getUrl, setUrl } from '../../stores/urlStore';
 import { generateShortUrl } from '../../utils/generateShortUrl'
 
 export async function POST({ request }) {
@@ -20,7 +21,12 @@ export async function POST({ request }) {
             );
         }
 
-        const shortURL = generateShortUrl();
+        let shortURL = generateShortUrl();
+
+        while (getUrl(shortURL) !== undefined) {
+            shortURL = generateShortUrl();
+        }
+        setUrl(shortURL, body.url);
 
         return new Response(
             JSON.stringify({
